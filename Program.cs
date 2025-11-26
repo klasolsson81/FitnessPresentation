@@ -30,18 +30,59 @@ public class Presentation
 
     private void ShowLandingPage()
     {
+        // 1. Rensa konsolen så vi har en ren yta
         AnsiConsole.Clear();
 
-        var panel = new Panel(
-            Align.Center(
-                new Markup("[grey]Tryck [yellow]ENTER[/] för att starta presentationen...\n[dim](Maximera terminalen först för bästa upplevelse!)[/][/]")
-            ))
-        {
-            Border = BoxBorder.None
-        };
+        // 2. Definiera "koden" med färger (VS Dark Mode style)
+        var codeMeme =
+            "[rgb(86,156,214)]public void[/] [rgb(220,220,170)]Workout[/]()\n" +
+            "{\n" +
+            "    [rgb(86,156,214)]if[/] (!workout.IsPainful)\n" +
+            "    {\n" +
+            "        gains.[rgb(220,220,170)]Add[/]([rgb(86,156,214)]null[/]); [rgb(87,166,74)]// No pain, no gain[/]\n" +
+            "    }\n" +
+            "    [rgb(86,156,214)]else[/]\n" +
+            "    {\n" +
+            "        body.[rgb(220,220,170)]LevelUp[/]();\n" +
+            "    }\n" +
+            "}";
 
-        AnsiConsole.Write(Align.Center(panel));
-        Console.ReadLine();
+        // 3. Skapa panelen
+        var panel = new Panel(new Markup(codeMeme))
+            .Header(" GymLogic.cs ", Justify.Left)
+            .Border(BoxBorder.Rounded)
+            .BorderStyle(new Style(Color.Grey))
+            .Padding(2, 1, 2, 1);
+
+        // 4. Räkna ut mitten vertikalt
+        // Vi drar av ca 10 rader (panelens höjd) från fönstrets höjd och delar på 2
+        int windowHeight = Console.WindowHeight;
+        int verticalPadding = (windowHeight / 2) - 6;
+
+        // Se till att vi inte kraschar om fönstret är pyttelitet
+        if (verticalPadding < 0) verticalPadding = 0;
+
+        // Skriv ut tomma rader för att trycka ner innehållet
+        for (int i = 0; i < verticalPadding; i++)
+        {
+            AnsiConsole.WriteLine();
+        }
+
+        // 5. Skriv ut panelen centrerad horisontellt
+        AnsiConsole.Write(
+            new Align(panel, HorizontalAlignment.Center)
+        );
+
+        // 6. Instruktion för att gå vidare (lite diskret under)
+        AnsiConsole.Write(new Align(
+            new Markup("[grey]Tryck på valfri tangent för att fortsätta...[/]"),
+            HorizontalAlignment.Center));
+
+        // 7. Vänta på tangenttryckning (true gör att tangenten inte skrivs ut på skärmen)
+        Console.ReadKey(true);
+
+        // Här fortsätter resten av ditt program...
+        AnsiConsole.MarkupLine("\n[green]Programmet fortsätter![/]");
 
         AnsiConsole.Clear();
         Thread.Sleep(500);  // Longer pause
@@ -127,56 +168,71 @@ public class Presentation
 
         Thread.Sleep(200);
 
-        var treeContent = @"[yellow]📁 FitnessProgressTracker[/]
-│
-├─[green]📁 Models[/]
-│  ├─ User.cs [dim](abstrakt basklass)[/]
-│  ├─ Client.cs
-│  ├─ PT.cs
-│  ├─ WorkoutPlan.cs
-│  ├─ DietPlan.cs
-│  ├─ DailyWorkout.cs
-│  ├─ DailyMealPlan.cs
-│  ├─ Exercise.cs
-│  ├─ ProgressLog.cs
-│  └─ Appointment.cs
-│
-├─[blue]📁 Services[/]
-│  ├─ LoginService.cs
-│  ├─ ClientService.cs
-│  ├─ ScheduleService.cs
-│  ├─ ProgressService.cs
-│  ├─ AiService.cs
-│  └─[magenta]📁 Interfaces[/]
-│     └─ IDataStore.cs
-│
-├─[yellow]📁 UI[/]
-│  ├─ Menu.cs
-│  ├─ ClientMenu.cs
-│  ├─ PtMenu.cs
-│  └─ SpectreUIHelper.cs
-│
-├─[red]📁 Data (JSON)[/]
-│  ├─ clients.json
-│  ├─ pts.json
-│  ├─ workouts.json
-│  ├─ diets.json
-│  └─ logs.json
-│
-├─ Program.cs
-└─ FitnessProgressTracker.csproj";
-
-        var treePanel = new Panel(new Markup(treeContent))
-        {
-            Border = BoxBorder.Rounded,
-            BorderStyle = new Style(Color.Cyan1),
-            Padding = new Padding(2, 1),
-            Width = 50
+        // Animated file structure - line by line
+        var treeLines = new (string text, string colorMarkup)[] {
+            ("📁 FitnessProgressTracker", "yellow"),
+            ("│", "grey"),
+            ("├─📁 Models", "green"),
+            ("│  ├─ User.cs (abstrakt basklass)", "white"),
+            ("│  ├─ Client.cs", "white"),
+            ("│  ├─ PT.cs", "white"),
+            ("│  ├─ WorkoutPlan.cs", "white"),
+            ("│  ├─ DietPlan.cs", "white"),
+            ("│  ├─ DailyWorkout.cs", "white"),
+            ("│  ├─ DailyMealPlan.cs", "white"),
+            ("│  ├─ Exercise.cs", "white"),
+            ("│  ├─ ProgressLog.cs", "white"),
+            ("│  └─ Appointment.cs", "white"),
+            ("│", "grey"),
+            ("├─📁 Services", "blue"),
+            ("│  ├─ LoginService.cs", "white"),
+            ("│  ├─ ClientService.cs", "white"),
+            ("│  ├─ ScheduleService.cs", "white"),
+            ("│  ├─ ProgressService.cs", "white"),
+            ("│  ├─ AiService.cs", "white"),
+            ("│  └─📁 Interfaces", "magenta1"),
+            ("│     └─ IDataStore.cs", "white"),
+            ("│", "grey"),
+            ("├─📁 UI", "yellow"),
+            ("│  ├─ Menu.cs", "white"),
+            ("│  ├─ ClientMenu.cs", "white"),
+            ("│  ├─ PtMenu.cs", "white"),
+            ("│  └─ SpectreUIHelper.cs", "white"),
+            ("│", "grey"),
+            ("├─📁 Data (JSON)", "red"),
+            ("│  ├─ clients.json", "white"),
+            ("│  ├─ pts.json", "white"),
+            ("│  ├─ workouts.json", "white"),
+            ("│  ├─ diets.json", "white"),
+            ("│  └─ logs.json", "white"),
+            ("│", "grey"),
+            ("├─ Program.cs", "white"),
+            ("└─ FitnessProgressTracker.csproj", "white")
         };
 
-        AnsiConsole.Write(Align.Center(treePanel));
+        // Calculate center padding
+        int boxWidth = 47;
+        int windowWidth = Console.WindowWidth;
+        int leftPadding = Math.Max(0, (windowWidth - boxWidth - 2) / 2);
+        string padding = new string(' ', leftPadding);
 
-        Thread.Sleep(500);
+        // Draw box top
+        AnsiConsole.MarkupLine($"{padding}[cyan1]╭{new string('─', boxWidth)}╮[/]");
+
+        // Animate each line
+        foreach (var (text, colorMarkup) in treeLines)
+        {
+            int textLen = text.Length;
+            int rightPad = boxWidth - textLen - 1;
+            if (rightPad < 0) rightPad = 0;
+            AnsiConsole.MarkupLine($"{padding}[cyan1]│[/] [{colorMarkup}]{EscapeMarkup(text)}[/]{new string(' ', rightPad)}[cyan1]│[/]");
+            Thread.Sleep(50);
+        }
+
+        // Draw box bottom
+        AnsiConsole.MarkupLine($"{padding}[cyan1]╰{new string('─', boxWidth)}╯[/]");
+
+        Thread.Sleep(300);
 
         AnsiConsole.WriteLine();
 
@@ -206,7 +262,7 @@ public class Presentation
 
         Thread.Sleep(400);
 
-        // Vision panel - using Align.Center directly
+        // Vision panel - shorter width
         var visionPanel = new Panel(
             Align.Center(new Markup("[bold cyan]En rollbaserad konsollapplikation\ndär PT:s och Klienter kan logga in[/]")))
         {
@@ -214,7 +270,7 @@ public class Presentation
             BorderStyle = new Style(Color.Cyan1),
             Header = new PanelHeader("[bold yellow] 🎯 VISION [/]"),
             Padding = new Padding(2, 1),
-            Width = 50
+            Width = 44
         };
 
         AnsiConsole.Write(Align.Center(visionPanel));
@@ -222,26 +278,27 @@ public class Presentation
         Thread.Sleep(600);
 
         PrintCentered("", Color.White);
-        PrintCentered("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━", Color.Grey);
+        PrintCentered("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━", Color.Grey);
         PrintCentered("", Color.White);
 
-        // CRUD - Simple centered text boxes
-        var grid = new Grid();
-        grid.AddColumn();
-        grid.AddColumn();
-        grid.AddColumn();
-        grid.AddColumn();
-        grid.AddColumn();
+        // ASCII Art CRUD boxes
+        string[] crudArt = {
+            "  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐",
+            "  │ [green]CREATE[/]  │ │  [blue]READ[/]   │ │ [yellow]UPDATE[/]  │ │ [red]DELETE[/]  │ │   [purple]AI[/]    │",
+            "  │   [green]📝[/]    │ │   [blue]👁️[/]    │ │   [yellow]✏️[/]    │ │   [red]🗑️[/]    │ │   [purple]🤖[/]    │",
+            "  └─────────┘ └─────────┘ └─────────┘ └─────────┘ └─────────┘"
+        };
 
-        grid.AddRow(
-            new Panel("[bold green]📝 CREATE[/]") { Border = BoxBorder.Double, BorderStyle = new Style(Color.Green) },
-            new Panel("[bold blue]👁️ READ[/]") { Border = BoxBorder.Double, BorderStyle = new Style(Color.Blue) },
-            new Panel("[bold yellow]✏️ UPDATE[/]") { Border = BoxBorder.Double, BorderStyle = new Style(Color.Yellow) },
-            new Panel("[bold red]🗑️ DELETE[/]") { Border = BoxBorder.Double, BorderStyle = new Style(Color.Red) },
-            new Panel("[bold purple]🤖 AI[/]") { Border = BoxBorder.Double, BorderStyle = new Style(Color.Purple) }
-        );
-
-        AnsiConsole.Write(Align.Center(grid));
+        foreach (var line in crudArt)
+        {
+            int width = Console.WindowWidth;
+            // Approximate visible length (rough estimate accounting for markup)
+            int visibleLength = 65;
+            int pad = Math.Max(0, (width - visibleLength) / 2);
+            Console.Write(new string(' ', pad));
+            AnsiConsole.MarkupLine(line);
+            Thread.Sleep(100);
+        }
 
         Thread.Sleep(400);
 
@@ -439,8 +496,7 @@ public class Presentation
                 Border = BoxBorder.Rounded,
                 BorderStyle = new Style(color),
                 Header = new PanelHeader($"[bold {color.ToMarkup()}] {icon} {name} [/]"),
-                Padding = new Padding(2, 0),
-                Width = 48
+                Padding = new Padding(2, 0)
             };
 
             AnsiConsole.Write(Align.Center(panel));
@@ -449,7 +505,7 @@ public class Presentation
 
         Thread.Sleep(300);
 
-        PrintCentered("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━", Color.Grey);
+        PrintCentered("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━", Color.Grey);
         PrintCentered("", Color.White);
         AnimateTextCentered("🔄 Agilt arbetssätt med feature branches", Color.Green, 20);
 
@@ -471,7 +527,7 @@ public class Presentation
             AnsiConsole.Clear();
             DrawSlideHeader("7", "KAOS & PROBLEM", Color.Red);
             PrintCentered(chaosText[rand.Next(chaosText.Length)], Color.Red);
-            Thread.Sleep(80);
+            Thread.Sleep(250);  // Slower animation - was 80
         }
 
         AnsiConsole.Clear();
@@ -499,8 +555,7 @@ public class Presentation
                 Border = BoxBorder.Heavy,
                 BorderStyle = new Style(color),
                 Header = new PanelHeader($"[bold {color.ToMarkup()}] {icon} {title} [/]"),
-                Padding = new Padding(2, 0),
-                Width = 70
+                Padding = new Padding(2, 0)
             };
 
             AnsiConsole.Write(Align.Center(panel));
@@ -515,6 +570,73 @@ public class Presentation
         DrawSlideHeader("8", "VAD HAR VI LÄRT OSS?", Color.Green);
 
         Thread.Sleep(200);
+
+        // Bomb animation with fuse
+        string[] bombFrames = {
+            @"
+       ╭───╮
+       │💣 │  ~~~~°
+       ╰───╯
+            ",
+            @"
+       ╭───╮
+       │💣 │  ~~~°
+       ╰───╯
+            ",
+            @"
+       ╭───╮
+       │💣 │  ~~°
+       ╰───╯
+            ",
+            @"
+       ╭───╮
+       │💣 │  ~°
+       ╰───╯
+            ",
+            @"
+       ╭───╮
+       │💣 │  °
+       ╰───╯
+            ",
+            @"
+       ╭───╮
+       │💣 │ *
+       ╰───╯
+            "
+        };
+
+        int cursorTop = Console.CursorTop;
+        foreach (var frame in bombFrames)
+        {
+            Console.SetCursorPosition(0, cursorTop);
+            foreach (var line in frame.Split('\n'))
+            {
+                PrintCentered(line, Color.Orange1);
+            }
+            Thread.Sleep(300);
+        }
+
+        // Explosion!
+        AnsiConsole.Clear();
+        DrawSlideHeader("8", "VAD HAR VI LÄRT OSS?", Color.Green);
+        PrintCentered("", Color.White);
+
+        string[] explosion = {
+            @"      ⠀⠀⠀⠀⠀ *  *  *",
+            @"    *    💥💥💥    *",
+            @"  *   💥  BOOM!  💥   *",
+            @"    *    💥💥💥    *",
+            @"      ⠀⠀⠀⠀⠀ *  *  *"
+        };
+
+        foreach (var line in explosion)
+        {
+            PrintCentered(line, Color.Yellow);
+        }
+        Thread.Sleep(500);
+
+        AnsiConsole.Clear();
+        DrawSlideHeader("8", "VAD HAR VI LÄRT OSS?", Color.Green);
 
         PrintCentered("", Color.White);
         AnimateTextCentered("🧠 KUNSKAPSEXPLOSION! 🧠", Color.Yellow, 25);
@@ -545,7 +667,7 @@ public class Presentation
         AnsiConsole.Write(learnTable);
 
         PrintCentered("", Color.White);
-        PrintCentered("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━", Color.Grey);
+        PrintCentered("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━", Color.Grey);
         PrintCentered("", Color.White);
         AnimateTextCentered("\"No pain, no gain!\" 💪", Color.Yellow, 25);
 
@@ -628,8 +750,7 @@ public class Presentation
         {
             Border = BoxBorder.Double,
             BorderStyle = new Style(Color.Yellow),
-            Padding = new Padding(3, 1),
-            Width = 40
+            Padding = new Padding(3, 1)
         };
 
         AnsiConsole.Write(Align.Center(finalPanel));
